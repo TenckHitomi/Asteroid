@@ -17,6 +17,13 @@ def display_score():
     pygame.draw.rect(display_surface, 'white', text_rect.inflate(30, 30), width=8, border_radius=10)
 
 
+def laser_timer(can_shoot, duration=500):
+    if not can_shoot:
+        current_time = pygame.time.get_ticks()
+        if current_time - shoot_time > duration:
+            can_shoot = True
+    return can_shoot
+
 
 # game init
 pygame.init()
@@ -35,7 +42,10 @@ background_surf = pygame.image.load('graphics/images/background.png').convert()
 # laser import
 laser_surf = pygame.image.load('graphics/images/laser.png').convert_alpha()
 laser_list = []
-laser_rect = laser_surf.get_rect(midbottom=ship_rect.midtop)
+
+# laser timer
+can_shoot = True
+shoot_time = None
 
 # text imports
 font = pygame.font.Font('graphics/fonts/subatomic.ttf', 50)
@@ -51,10 +61,14 @@ while True:
             pygame.quit()
             sys.exit()
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            print('shoot laser')
+        if event.type == pygame.MOUSEBUTTONDOWN and can_shoot:
+            # laser
             laser_rect = laser_surf.get_rect(midbottom=ship_rect.midtop)
             laser_list.append(laser_rect)
+
+            # timer
+            can_shoot = False
+            shoot_time = pygame.time.get_ticks()
 
     # framerate limit
     dt = clock.tick(120) / 1000
@@ -64,7 +78,7 @@ while True:
 
     # update
     laser_update(laser_list)
-
+    can_shoot = laser_timer(can_shoot, 500)
     pygame.time.get_ticks()
 
     # drawing
