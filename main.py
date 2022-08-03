@@ -108,6 +108,20 @@ while True:
     can_shoot = laser_timer(can_shoot, 500)
     pygame.time.get_ticks()
 
+    # meteor ship collision
+    for meteor_tuple in meteor_list:
+        meteor_rect = meteor_tuple[0]
+        if ship_rect.colliderect(meteor_rect):
+            pygame.quit()
+            sys.exit()
+
+    # laser meteor collisions
+    for laser_rect in laser_list:
+        for meteor_tuple in meteor_list:
+            if laser_rect.colliderect(meteor_tuple[0]):
+                meteor_list.remove(meteor_tuple)
+                laser_list.remove(laser_rect)
+
     # drawing
     display_surface.fill((0, 0, 0))
     meteor_update(meteor_list)
