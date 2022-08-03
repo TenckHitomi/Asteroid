@@ -1,5 +1,6 @@
 import pygame
 import sys
+from random import randint, uniform
 
 
 def laser_update(laser_list, speed=300):
@@ -7,6 +8,15 @@ def laser_update(laser_list, speed=300):
         rect.y -= speed * dt
         if rect.bottom < 0:
             laser_list.remove(rect)
+
+
+def meteor_update(meteor_list, speed=300):
+    for meteor_tuple in meteor_list:
+        direction = meteor_tuple[1]
+        meteor_rect = meteor_tuple[0]
+        meteor_rect.center += direction * speed * dt
+        if meteor_rect.top > WINDOW_HEIGHT:
+            meteor_list.remove(meteor_tuple)
 
 
 def display_score():
@@ -50,8 +60,13 @@ shoot_time = None
 # text imports
 font = pygame.font.Font('graphics/fonts/subatomic.ttf', 50)
 
-# drawing
+# meteor
+meteor_surf = pygame.image.load('graphics/images/meteor.png').convert_alpha()
+meteor_list = []
 
+# meteor timer
+meteor_timer = pygame.event.custom_type()
+pygame.time.set_timer(meteor_timer, 500)
 
 while True:
 
@@ -70,6 +85,18 @@ while True:
             can_shoot = False
             shoot_time = pygame.time.get_ticks()
 
+        if event.type == meteor_timer:
+
+            # random position
+            x_pos = randint(-100, WINDOW_WIDTH + 100)
+            y_pos = randint(-100, -50)
+
+            # creating a rect
+            meteor_rect = meteor_surf.get_rect(center=(x_pos, y_pos))
+            # create a random direction
+            direction = pygame.math.Vector2(uniform(-0.5, 0.5), 1)
+            meteor_list.append((meteor_rect, direction))
+
     # framerate limit
     dt = clock.tick(120) / 1000
 
@@ -83,6 +110,7 @@ while True:
 
     # drawing
     display_surface.fill((0, 0, 0))
+    meteor_update(meteor_list)
     display_surface.blit(background_surf, (0, 0))
 
     display_score()
@@ -90,6 +118,9 @@ while True:
     # for loop that draws laser surface
     for laser in laser_list:
         display_surface.blit(laser_surf, laser)
+
+    for meteor_tuple in meteor_list:
+        display_surface.blit(meteor_surf, meteor_tuple[0])
 
     display_surface.blit(ship_surf, ship_rect)
 
