@@ -68,6 +68,9 @@ meteor_list = []
 meteor_timer = pygame.event.custom_type()
 pygame.time.set_timer(meteor_timer, 500)
 
+# import sound
+laser_sound = pygame.mixer.Sound('graphics/sounds/laser.ogg')
+
 while True:
 
     # event loop
@@ -80,6 +83,9 @@ while True:
             # laser
             laser_rect = laser_surf.get_rect(midbottom=ship_rect.midtop)
             laser_list.append(laser_rect)
+
+            # play laser sound
+            laser_sound.play()
 
             # timer
             can_shoot = False
